@@ -48,3 +48,5 @@
 **MySQL credentials:**
 root
 flabagaster3D* (temporary for testing)
+
+GitHub: https://github.com/mottamx/LittleLemon/
