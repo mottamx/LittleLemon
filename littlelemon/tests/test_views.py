@@ -1,25 +1,21 @@
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import User
-
 from rest_framework import status
-from rest_framework.test import APIClient, APITestCase
-from rest_framework.authtoken.models import Token
-
-from restaurant.views import Menu
+from rest_framework.test import APITestCase
+from restaurant.models import Menu
+import json
 from restaurant.serializers import MenuSerializer
 
 class MenuViewTest(APITestCase):
     def setUp(self):
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer 0c56e6181c72efc15602be1706efa5c4ef4d0579')
-        Menu.objects.create(title="Dish2", price=10.99, inventory=2)
-        self.url = reverse('menu-list')
-
-    def test_getall_authenticated(self):
-        response = self.client.get(self.url)
-        #print(response.content)  # Print the response content
-        last_menu = Menu.objects.last()
-        serializer = MenuSerializer([last_menu], many=True)
-
+        self.menu_item1 = Menu.objects.create(title = "Pizza", price = 12.99, inventory = 5)
+        self.menu_item2 = Menu.objects.create(title = "Burger", price = 8.99, inventory = 10)
+        
+    def test_getall(self):
+        url = reverse('menu-list') # takes a view name as an argument and returns the corresponding URL
+        response = self.client.get(url) # sends a GET request to the URL returned by 'reverse' and stores the response in the 'response' variable
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        menu_items = Menu.objects.all() # gets a queryset of all 'Menu' objects from the database
+        serializer = MenuSerializer(menu_items, many = True) # serializes the queryset of 'Menu' objects into a JSON-like format
         self.assertEqual(response.data, serializer.data)
